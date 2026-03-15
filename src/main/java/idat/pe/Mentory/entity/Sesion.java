@@ -49,8 +49,4 @@ public class Sesion {
     @OneToMany(mappedBy = "sesion")
     @Builder.Default
     private Set<Asistencia> asistencias = new HashSet<>();
-
-    @OneToMany(mappedBy = "sesion")
-    @Builder.Default
-    private Set<Tarea> tareas = new HashSet<>();
 }

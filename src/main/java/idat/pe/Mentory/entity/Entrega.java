@@ -39,8 +39,17 @@ public class Entrega {
     @JoinColumn(name = "estudiante_id", nullable = false)
     private Usuario estudiante;
 
-    @Column(name = "archivo_url", length = 255)
-    private String archivoUrl;
+    @Column(name = "archivo_key", columnDefinition = "TEXT")
+    private String archivoKey;
+
+    @Column(name = "nombre_archivo", length = 255)
+    private String nombreArchivo;
+
+    @Column(name = "peso_bytes")
+    private Long pesoBytes;
+
+    @Column(name = "formato", length = 50)
+    private String formato;
 
     @Column(name = "fecha_entrega")
     private LocalDateTime fechaEntrega;

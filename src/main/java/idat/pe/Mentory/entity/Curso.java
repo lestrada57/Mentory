@@ -64,4 +64,8 @@ public class Curso {
     @OneToMany(mappedBy = "curso")
     @Builder.Default
     private Set<Contenido> contenidos = new HashSet<>();
+
+    @OneToMany(mappedBy = "curso")
+    @Builder.Default
+    private Set<Tarea> tareas = new HashSet<>();
 }

@@ -2,6 +2,9 @@ package idat.pe.Mentory.dto;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +18,10 @@ import lombok.Setter;
 @Builder
 public class TareaDto {
     private Long id;
-    private Long sesionId;
+    @NotNull
+    private Long cursoId;
+    @NotBlank
+    @Size(max = 150)
     private String titulo;
     private String descripcion;
     private LocalDateTime fechaLimite;

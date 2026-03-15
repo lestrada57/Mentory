@@ -2,6 +2,7 @@ package idat.pe.Mentory.service.impl;
 
 import idat.pe.Mentory.entity.Contenido;
 import idat.pe.Mentory.repository.ContenidoRepository;
+import idat.pe.Mentory.repository.CursoRepository;
 import idat.pe.Mentory.service.ContenidoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Optional;
 public class ContenidoServiceImpl implements ContenidoService {
 
     private final ContenidoRepository contenidoRepository;
+    private final CursoRepository cursoRepository;
 
     @Override
     public List<Contenido> findAll() {
@@ -27,6 +29,11 @@ public class ContenidoServiceImpl implements ContenidoService {
 
     @Override
     public Contenido save(Contenido contenido) {
+        if (contenido.getCurso() == null || contenido.getCurso().getId() == null) {
+            throw new IllegalArgumentException("cursoId es obligatorio para guardar contenido");
+        }
+        cursoRepository.findById(contenido.getCurso().getId())
+                .orElseThrow(() -> new IllegalArgumentException("No existe el curso asociado al contenido"));
         return contenidoRepository.save(contenido);
     }
 

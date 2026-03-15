@@ -35,7 +35,7 @@ public class Tarea {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "curso_id", nullable = false)
-    private Sesion sesion;
+    private Curso curso;
 
     @Column(name = "titulo", nullable = false, length = 150)
     private String titulo;

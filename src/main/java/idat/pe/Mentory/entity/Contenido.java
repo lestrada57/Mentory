@@ -43,8 +43,17 @@ public class Contenido {
     @Column(name = "tipo", length = 50)
     private String tipo;
 
-    @Column(name = "url_archivo", length = 255)
-    private String urlArchivo;
+    @Column(name = "archivo_key", columnDefinition = "TEXT")
+    private String archivoKey;
+
+    @Column(name = "nombre_archivo", length = 255)
+    private String nombreArchivo;
+
+    @Column(name = "peso_bytes")
+    private Long pesoBytes;
+
+    @Column(name = "formato", length = 50)
+    private String formato;
 
     @Column(name = "estado", length = 50)
     private String estado;

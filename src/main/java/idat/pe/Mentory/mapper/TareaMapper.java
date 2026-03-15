@@ -4,24 +4,24 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import idat.pe.Mentory.dto.TareaDto;
-import idat.pe.Mentory.entity.Sesion;
+import idat.pe.Mentory.entity.Curso;
 import idat.pe.Mentory.entity.Tarea;
 
 @Mapper(componentModel = "spring")
 public interface TareaMapper {
-    @Mapping(target = "sesionId", source = "sesion.id")
+    @Mapping(target = "cursoId", source = "curso.id")
     TareaDto toDto(Tarea entity);
 
-    @Mapping(target = "sesion", source = "sesionId")
+    @Mapping(target = "curso", source = "cursoId")
     @Mapping(target = "entregas", ignore = true)
     Tarea toEntity(TareaDto dto);
 
-    default Sesion mapSesion(Long id) {
+    default Curso mapCurso(Long id) {
         if (id == null) {
             return null;
         }
-        Sesion sesion = new Sesion();
-        sesion.setId(id);
-        return sesion;
+        Curso curso = new Curso();
+        curso.setId(id);
+        return curso;
     }
 }

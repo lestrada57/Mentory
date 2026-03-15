@@ -16,6 +16,7 @@ public interface CursoMapper {
     @Mapping(target = "sesiones", ignore = true)
     @Mapping(target = "inscripciones", ignore = true)
     @Mapping(target = "contenidos", ignore = true)
+    @Mapping(target = "tareas", ignore = true)
     Curso toEntity(CursoDto dto);
 
     default Usuario mapUsuario(Long id) {

@@ -14,7 +14,6 @@ public interface SesionMapper {
 
     @Mapping(target = "curso", source = "cursoId")
     @Mapping(target = "asistencias", ignore = true)
-    @Mapping(target = "tareas", ignore = true)
     Sesion toEntity(SesionDto dto);
 
     default Curso mapCurso(Long id) {
