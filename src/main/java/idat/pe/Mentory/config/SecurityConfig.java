@@ -40,7 +40,8 @@ public class SecurityConfig {
                     response.getWriter().write("{\"error\":\"No autenticado\"}");
                 }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/saludo").permitAll()
                         .requestMatchers("/api/roles/**", "/api/permisos/**").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST, "/api/cursos/**").hasAnyRole("ADMINISTRADOR", "DOCENTE")
