@@ -40,7 +40,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public UsuarioResponseDto signUp(SignUpRequestDto request) {
-        if (usuarioRepository.existsByEmailIgnoreCase(request.getEmail())) {
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
+        if (usuarioRepository.existsByEmailIgnoreCase(normalizedEmail)) {
             throw new ResponseStatusException(BAD_REQUEST, "El correo ya está registrado");
         }
 
@@ -49,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         Usuario usuario = Usuario.builder()
                 .nombres(request.getNombres())
                 .apellidos(request.getApellidos())
-                .email(request.getEmail().trim().toLowerCase())
+                .email(normalizedEmail)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .rol(rol)
                 .activo(true)
@@ -71,15 +72,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDto login(LoginRequestDto request) {
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(normalizedEmail, request.getPassword())
             );
         } catch (Exception ex) {
             throw new ResponseStatusException(UNAUTHORIZED, "Credenciales inválidas");
         }
 
-        Usuario usuario = usuarioRepository.findByEmailIgnoreCase(request.getEmail())
+        Usuario usuario = usuarioRepository.findByEmailIgnoreCase(normalizedEmail)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Usuario no encontrado"));
         UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getEmail());
         String token = jwtService.generateToken(usuario.getId(), usuario.getRol().getName(), userDetails);
