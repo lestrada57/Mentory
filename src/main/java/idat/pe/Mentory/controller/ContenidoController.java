@@ -13,15 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -69,5 +66,19 @@ public class ContenidoController {
             return null;
         }
         return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+    }
+
+    @GetMapping("/{id}/download")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'DOCENTE', 'ESTUDIANTE')")
+    public Map<String, String> downloadContenido(@PathVariable Long id) {
+        Contenido contenido = contenidoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contenido no encontrado"));
+
+        if (contenido.getArchivoKey() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El contenido no tiene un archivo asociado");
+        }
+
+        String downloadUrl = minioService.getPresignedUrl(contenido.getArchivoKey());
+        return Map.of("downloadUrl", downloadUrl);
     }
 }
