@@ -21,8 +21,18 @@ public class SesionServiceImpl implements SesionService {
     }
 
     @Override
+    public List<Sesion> findAllByCursoId(Long cursoId) {
+        return sesionRepository.findAllByCursoIdOrderByFechaAsc(cursoId);
+    }
+
+    @Override
     public Optional<Sesion> findById(Long id) {
         return sesionRepository.findById(id);
+    }
+
+    @Override
+    public boolean existsByIdAndCursoId(Long id, Long cursoId) {
+        return sesionRepository.existsByIdAndCursoId(id, cursoId);
     }
 
     @Override

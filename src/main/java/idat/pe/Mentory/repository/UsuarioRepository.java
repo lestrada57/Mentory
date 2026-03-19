@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.List;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByEmailIgnoreCase(String email);
@@ -21,4 +22,21 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             where lower(u.email) = lower(:email)
             """)
     Optional<Usuario> findByEmailWithAuthorities(@Param("email") String email);
+
+    @Query("""
+            select u
+            from Usuario u
+            join fetch u.rol r
+            where upper(r.name) in ('DOCENTE', 'ESTUDIANTE')
+            order by u.createdAt desc, u.id desc
+            """)
+    List<Usuario> findAdminManageableUsers();
+
+    @Query("""
+            select u
+            from Usuario u
+            join fetch u.rol r
+            where u.id = :id
+            """)
+    Optional<Usuario> findByIdWithRol(@Param("id") Long id);
 }

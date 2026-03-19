@@ -21,8 +21,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public List<Usuario> findAdminManageableUsers() {
+        return usuarioRepository.findAdminManageableUsers();
+    }
+
+    @Override
     public Optional<Usuario> findById(Long id) {
         return usuarioRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Usuario> findByIdWithRol(Long id) {
+        return usuarioRepository.findByIdWithRol(id);
     }
 
     @Override
