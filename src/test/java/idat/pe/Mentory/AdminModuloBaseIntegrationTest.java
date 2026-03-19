@@ -115,6 +115,31 @@ class AdminModuloBaseIntegrationTest {
                 .andExpect(jsonPath("$.id").value(docente.getId()))
                 .andExpect(jsonPath("$.rol").value("DOCENTE"));
 
+        String changeRolBody = """
+                {
+                  "nombres":"Docente Actualizado",
+                  "apellidos":"Principal",
+                  "email":"docente.edit.%s@mentory.com",
+                  "rolId":%d
+                }
+                """.formatted(suffix, rolEstudiante.getId());
+
+        mockMvc.perform(put("/api/usuarios/{id}", docente.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(changeRolBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(docente.getId()))
+                .andExpect(jsonPath("$.rol").value("ESTUDIANTE"));
+
+        mockMvc.perform(put("/api/usuarios/{id}", docente.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateUsuarioBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(docente.getId()))
+                .andExpect(jsonPath("$.rol").value("DOCENTE"));
+
         mockMvc.perform(patch("/api/usuarios/{id}/bloquear", estudiante.getId())
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())

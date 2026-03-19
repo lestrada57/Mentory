@@ -48,8 +48,9 @@ public class UsuarioController {
     @PutMapping("/{id}")
     public UsuarioResponseDto update(@PathVariable Long id, @Valid @RequestBody AdminUsuarioUpdateRequestDto request) {
         Usuario existing = getManageableById(id);
-        if (usuarioRepository.existsByEmailIgnoreCase(request.getEmail())
-                && !existing.getEmail().equalsIgnoreCase(request.getEmail())) {
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
+        if (usuarioRepository.existsByEmailIgnoreCase(normalizedEmail)
+                && !existing.getEmail().equalsIgnoreCase(normalizedEmail)) {
             throw new ResponseStatusException(BAD_REQUEST, "El correo ya está registrado");
         }
         Rol rol = rolRepository.findById(request.getRolId())
@@ -57,23 +58,23 @@ public class UsuarioController {
         validateManageableRole(rol.getName());
         existing.setNombres(request.getNombres());
         existing.setApellidos(request.getApellidos());
-        existing.setEmail(request.getEmail().trim().toLowerCase());
+        existing.setEmail(normalizedEmail);
         existing.setRol(rol);
-        return toResponse(usuarioService.save(existing));
+        return toResponse(saveAndReloadWithRol(existing));
     }
 
     @PatchMapping("/{id}/bloquear")
     public UsuarioResponseDto bloquear(@PathVariable Long id) {
         Usuario existing = getManageableById(id);
         existing.setActivo(false);
-        return toResponse(usuarioService.save(existing));
+        return toResponse(saveAndReloadWithRol(existing));
     }
 
     @PatchMapping("/{id}/activar")
     public UsuarioResponseDto activar(@PathVariable Long id) {
         Usuario existing = getManageableById(id);
         existing.setActivo(true);
-        return toResponse(usuarioService.save(existing));
+        return toResponse(saveAndReloadWithRol(existing));
     }
 
     private Usuario getManageableById(Long id) {
@@ -87,6 +88,12 @@ public class UsuarioController {
         if (!"DOCENTE".equalsIgnoreCase(roleName) && !"ESTUDIANTE".equalsIgnoreCase(roleName)) {
             throw new ResponseStatusException(BAD_REQUEST, "Solo se gestionan usuarios docentes y estudiantes");
         }
+    }
+
+    private Usuario saveAndReloadWithRol(Usuario usuario) {
+        Usuario saved = usuarioService.save(usuario);
+        return usuarioService.findByIdWithRol(saved.getId())
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Usuario no encontrado tras actualizar"));
     }
 
     private UsuarioResponseDto toResponse(Usuario usuario) {
