@@ -7,23 +7,21 @@ import idat.pe.Mentory.entity.Usuario;
 import idat.pe.Mentory.mapper.CursoMapper;
 import idat.pe.Mentory.service.CursoService;
 import idat.pe.Mentory.service.UsuarioService;
+import idat.pe.Mentory.repository.CursoRepository;
+import idat.pe.Mentory.service.MinioService;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -35,11 +33,26 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class CursoController {
 
     private final CursoService cursoService;
+    private final CursoRepository cursoRepository; // Inyectado
+    private final MinioService minioService;
     private final UsuarioService usuarioService;
     private final CursoMapper cursoMapper;
 
+    @PostMapping(value = "/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Map<String, String> uploadImagen(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        Curso curso = cursoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Curso no encontrado"));
+
+        String imageKey = minioService.uploadFile(file, "cursos/portadas");
+        curso.setImagenKey(imageKey);
+        cursoRepository.save(curso);
+
+        return Map.of("imagenKey", imageKey, "url", minioService.getPresignedUrl(imageKey));
+    }
+
     @GetMapping
     public List<CursoDto> getAll() {
+
         return cursoService.findAll().stream().map(cursoMapper::toDto).toList();
     }
 

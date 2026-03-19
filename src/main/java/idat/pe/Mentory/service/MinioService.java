@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.InputStream;
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -27,10 +26,14 @@ public class MinioService {
     private String bucketName;
 
     public String uploadFile(MultipartFile file) {
+        return uploadFile(file, "general");
+    }
+
+    public String uploadFile(MultipartFile file, String folder) {
         if (file == null || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo es obligatorio");
         }
-        String objectKey = buildObjectKey(file.getOriginalFilename());
+        String objectKey = buildObjectKey(file.getOriginalFilename(), folder);
         try (InputStream inputStream = file.getInputStream()) {
             ensureBucketExists();
             minioClient.putObject(
@@ -90,10 +93,15 @@ public class MinioService {
         }
     }
 
-    private String buildObjectKey(String originalFilename) {
+    private String buildObjectKey(String originalFilename, String folder) {
         String safeFilename = originalFilename == null ? "archivo.bin" : originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
-        LocalDate now = LocalDate.now();
-        return "contenidos/" + now.getYear() + "/" + now.getMonthValue() + "/" + UUID.randomUUID() + "-" + safeFilename;
+
+        // Limpiamos el folder de posibles slashes al final
+        if (folder.endsWith("/")) {
+            folder = folder.substring(0, folder.length() - 1);
+        }
+
+        return folder + "/" + UUID.randomUUID() + "-" + safeFilename;
     }
 
     private String resolveContentType(String contentType) {
