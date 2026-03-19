@@ -1,8 +1,7 @@
 package idat.pe.Mentory.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,13 +13,16 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CursoDto {
-    private Long id;
-    private String nombre;
+public class ContenidoUploadRequestDto {
+    @NotNull
+    private Long cursoId;
+
+    @NotBlank
+    private String titulo;
+
     private String descripcion;
-    private BigDecimal precio;
-    private Long docenteId;
+
+    private String tipo;
+
     private String estado;
-    private String imagenKey;
-    private LocalDateTime createdAt;
 }

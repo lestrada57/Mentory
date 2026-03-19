@@ -31,9 +31,15 @@ public class Entrega {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "tarea_id", nullable = false, insertable = false, updatable = false)
+    private Long tareaId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tarea_id", nullable = false)
     private Tarea tarea;
+
+    @Column(name = "estudiante_id", nullable = false, insertable = false, updatable = false)
+    private Long estudianteId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "estudiante_id", nullable = false)

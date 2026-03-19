@@ -30,6 +30,9 @@ public class Contenido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "curso_id", nullable = false, insertable = false, updatable = false)
+    private Long cursoId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "curso_id", nullable = false)
     private Curso curso;

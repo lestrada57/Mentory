@@ -43,12 +43,18 @@ public class Curso {
     @Column(name = "precio", nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
 
+    @Column(name = "docente_id", nullable = false, insertable = false, updatable = false)
+    private Long docenteId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "docente_id", nullable = false)
     private Usuario docente;
 
     @Column(name = "estado", length = 50)
     private String estado;
+
+    @Column(name = "imagen_key", columnDefinition = "TEXT")
+    private String imagenKey;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
