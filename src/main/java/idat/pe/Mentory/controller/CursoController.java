@@ -29,7 +29,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestController
 @RequestMapping("/api/cursos")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class CursoController {
 
     private final CursoService cursoService;
@@ -38,7 +37,21 @@ public class CursoController {
     private final UsuarioService usuarioService;
     private final CursoMapper cursoMapper;
 
+    @GetMapping("/{id}/imagen")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'DOCENTE', 'ESTUDIANTE')")
+    public Map<String, String> getImagenUrl(@PathVariable Long id) {
+        Curso curso = cursoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Curso no encontrado"));
+
+        if (curso.getImagenKey() == null || curso.getImagenKey().isBlank()) {
+            throw new ResponseStatusException(NOT_FOUND, "El curso no tiene imagen asignada");
+        }
+
+        return Map.of("url", minioService.getPresignedUrl(curso.getImagenKey()));
+    }
+
     @PostMapping(value = "/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public Map<String, String> uploadImagen(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         Curso curso = cursoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Curso no encontrado"));
@@ -51,12 +64,14 @@ public class CursoController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public List<CursoDto> getAll() {
 
         return cursoService.findAll().stream().map(cursoMapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public CursoDto getById(@PathVariable Long id) {
         Curso curso = cursoService.findById(id).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Curso no encontrado"));
         return cursoMapper.toDto(curso);
@@ -64,6 +79,7 @@ public class CursoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public CursoDto create(@Valid @RequestBody AdminCursoRequestDto request) {
         Usuario docente = getDocenteOrThrow(request.getDocenteId());
         Curso curso = Curso.builder()
@@ -78,6 +94,7 @@ public class CursoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public CursoDto update(@PathVariable Long id, @Valid @RequestBody AdminCursoRequestDto request) {
         Curso existing = cursoService.findById(id).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Curso no encontrado"));
         Usuario docente = getDocenteOrThrow(request.getDocenteId());
@@ -91,6 +108,7 @@ public class CursoController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public void delete(@PathVariable Long id) {
         Curso existing = cursoService.findById(id).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Curso no encontrado"));
         cursoService.deleteById(existing.getId());
