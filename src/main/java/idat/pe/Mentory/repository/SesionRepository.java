@@ -9,4 +9,6 @@ public interface SesionRepository extends JpaRepository<Sesion, Long> {
     List<Sesion> findAllByCursoIdOrderByFechaAsc(Long cursoId);
 
     boolean existsByIdAndCursoId(Long id, Long cursoId);
+
+    int countByCursoId(Long cursoId);
 }

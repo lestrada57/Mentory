@@ -1,6 +1,7 @@
 package idat.pe.Mentory.service;
 
 import idat.pe.Mentory.entity.Asistencia;
+import idat.pe.Mentory.dto.AsistenciaBulkRequestDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +14,6 @@ public interface AsistenciaService {
     Asistencia save(Asistencia asistencia);
 
     void deleteById(Long id);
+
+    void registrarAsistenciaMasiva(Long sesionId, List<AsistenciaBulkRequestDto.RegistroAsistenciaDto> registros);
 }
